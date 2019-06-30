@@ -24,3 +24,12 @@ func prompt(args args) (string, error) {
 	}
 	return string(bs), nil
 }
+
+func easyPrompt(user string) (string, error) {
+	color.White("  password for '%s' --> ", user)
+	bs, err := terminal.ReadPassword(int(os.Stdin.Fd()))
+	if err != nil {
+		return "", errors.Wrap(err, "failed to read password")
+	}
+	return string(bs), nil
+}

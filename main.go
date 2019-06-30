@@ -59,12 +59,7 @@ func main() {
 		color.Magenta("on hosts")
 		color.Yellow(fmt.Sprintf("%v", hosts))
 
-		pswd, err := prompt(args)
-		if err != nil {
-			dief("failed to read password: %v", err)
-		}
-
-		if err := runCmd(args.user, pswd, hosts, args.command, args.pw); err != nil {
+		if err := runCmd(args.user, hosts, args.command, args.pw); err != nil {
 			dief("failed to run command: %v", err)
 		}
 	}

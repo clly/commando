@@ -115,7 +115,15 @@ func run(user, pass string, hosts []string, files []scriptfile) error {
 	return nil
 }
 
-func runCmd(user, pass string, hosts []string, command string, pw bool) error {
+func runCmd(user string, hosts []string, command string, pw bool) error {
+	var pass string
+	if pw {
+		var err error
+		pass, err = easyPrompt(user)
+		if err != nil {
+			return err
+		}
+	}
 	for _, host := range hosts {
 		client, err := makeClient(user, pass, host)
 		if err != nil {
@@ -214,13 +222,26 @@ func executeScript(client *ssh.Client, user, pass, host string, sc script) error
 
 func makeClient(user, pass, host string) (*ssh.Client, error) {
 	config := &ssh.ClientConfig{
-		User: user,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(pass),
-		},
+		User:            user,
+		Auth:            newSSHAuth(user, pass),
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
 	address := fmt.Sprintf("%s:22", host)
 	return ssh.Dial("tcp", address, config)
+}
+
+func newSSHAuth(user, pass string) []ssh.AuthMethod {
+	authMethods := make([]ssh.AuthMethod, 0)
+	sshAgent := sshAgentAuth()
+	if sshAgent != nil {
+		authMethods = append(authMethods, sshAgent)
+	}
+
+	if pass == "" {
+		authMethods = append(authMethods, PasswordCallback(user))
+	} else {
+		authMethods = append(authMethods, ssh.Password(pass))
+	}
+	return authMethods
 }
