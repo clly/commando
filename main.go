@@ -45,9 +45,14 @@ func main() {
 		color.Magenta("on hosts")
 		color.Yellow(fmt.Sprintf("%v", hosts))
 
-		pswd, err := prompt(args)
-		if err != nil {
-			dief("failed to read password: %v", err)
+		var pswd string
+		for _, script := range scripts {
+			if script.sudo {
+				pswd, err = prompt(args)
+				if err != nil {
+					dief("failed to read password: %v", err)
+				}
+			}
 		}
 
 		if err := run(args.user, pswd, hosts, scripts); err != nil {

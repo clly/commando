@@ -20,10 +20,11 @@ type script struct {
 	stdin   []string
 }
 
-// A scriptfile contains one or more scripts to be executed.
+// A scriptfile contains one or more scripts to be executed. the first line is the command and the second line is stdin
 type scriptfile struct {
 	name    string
 	scripts []script
+	sudo    bool
 }
 
 func (s scriptfile) String() string {
@@ -69,10 +70,14 @@ func read(name, path string) (scriptfile, error) {
 }
 
 func parse(name, content string) (scriptfile, error) {
+	// --- is a "key" string which causes us to create a new "script" from a single file
 	parts := strings.Split(content, "---")
 	scriptfile := scriptfile{name: name}
 
 	for _, part := range parts {
+		if strings.Contains(part, "PASSWORD") {
+			scriptfile.sudo = true
+		}
 		lines := cleanup(strings.Split(part, "\n"))
 		if len(lines) == 0 {
 			return scriptfile, errors.Errorf("no command in script %s", name)
@@ -117,12 +122,14 @@ func run(user, pass string, hosts []string, files []scriptfile) error {
 
 func runCmd(user string, hosts []string, command string, pw bool) error {
 	var pass string
-	if pw {
+
+	if pw || strings.Contains(command, "sudo") {
 		var err error
 		pass, err = easyPrompt(user)
 		if err != nil {
 			return err
 		}
+		pw = true
 	}
 	for _, host := range hosts {
 		client, err := makeClient(user, pass, host)
