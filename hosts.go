@@ -1,5 +1,3 @@
-// Author hoenig
-
 package main
 
 import (
@@ -21,7 +19,7 @@ func hosts(input string) []string {
 }
 
 func resolve(resolvable []string) []string {
-	resolved := []string{}
+	var resolved []string
 	for _, raw := range resolvable {
 		resolved = append(resolved, expand(raw)...)
 	}
@@ -29,7 +27,7 @@ func resolve(resolvable []string) []string {
 }
 
 func expand(raw string) []string {
-	expanded := []string{}
+	var expanded []string
 	raw = strings.TrimSpace(raw)
 
 	matches := expandRe.FindAllStringSubmatch(raw, -1)

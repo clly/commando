@@ -1,4 +1,4 @@
-module github.com/shoenig/commando
+module go.gophers.dev/cmds/commando
 
 require (
 	github.com/davecgh/go-spew v1.1.0 // indirect

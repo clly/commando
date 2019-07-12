@@ -1,5 +1,3 @@
-// Author hoenig
-
 package main
 
 import (
@@ -121,14 +119,14 @@ func Test_parseScriptWithSudo(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scriptfile, err := parse(test.name, test.content)
+		scriptFile, err := parse(test.name, test.content)
 		require.NoError(t, err)
-		require.Equal(t, test.name, scriptfile.name)
-		require.Equal(t, len(test.expScripts), len(scriptfile.scripts))
-		require.True(t, scriptfile.sudo, "Failed to parse whether or not we need a password")
+		require.Equal(t, test.name, scriptFile.name)
+		require.Equal(t, len(test.expScripts), len(scriptFile.scripts))
+		require.True(t, scriptFile.sudo, "Failed to parse whether or not we need a password")
 		for i := 0; i < len(test.expScripts); i++ {
 			expScript := test.expScripts[i]
-			script := scriptfile.scripts[i]
+			script := scriptFile.scripts[i]
 			require.Equal(t, expScript.command, script.command)
 			require.Equal(t, len(expScript.stdin), len(script.stdin))
 			for j := 0; j < len(expScript.stdin); j++ {
@@ -189,14 +187,14 @@ func Test_parseScriptWithoutSudo(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		scriptfile, err := parse(test.name, test.content)
+		scriptFile, err := parse(test.name, test.content)
 		require.NoError(t, err)
-		require.Equal(t, test.name, scriptfile.name)
-		require.Equal(t, len(test.expScripts), len(scriptfile.scripts))
-		require.False(t, scriptfile.sudo, "%q %q %q", scriptfile.scripts, scriptfile.sudo, test.name)
+		require.Equal(t, test.name, scriptFile.name)
+		require.Equal(t, len(test.expScripts), len(scriptFile.scripts))
+		require.False(t, scriptFile.sudo, "%q %q %q", scriptFile.scripts, scriptFile.sudo, test.name)
 		for i := 0; i < len(test.expScripts); i++ {
 			expScript := test.expScripts[i]
-			script := scriptfile.scripts[i]
+			script := scriptFile.scripts[i]
 			require.Equal(t, expScript.command, script.command)
 			require.Equal(t, len(expScript.stdin), len(script.stdin))
 			for j := 0; j < len(expScript.stdin); j++ {

@@ -1,6 +1,4 @@
-// Author hoenig
-
-// commando is a command line tool for executing expect scripts
+// Command commando is a command line tool for executing expect scripts
 // via ssh on remote servers. It is as terrible as it sounds.
 package main
 
@@ -19,17 +17,17 @@ func main() {
 	v := args.verbose
 
 	tracef(v, "cliargs user: %q", args.user)
-	tracef(v, "cliargs hosts: %q", args.hostexp)
-	tracef(v, "cliargs scripts: %q", args.scriptdir)
+	tracef(v, "cliargs hosts: %q", args.hostList)
+	tracef(v, "cliargs scripts: %q", args.scriptDir)
 	tracef(v, "cliargs command: %q", args.command)
-	tracef(v, "cliargs nopassword: %q", args.nopassword)
+	tracef(v, "cliargs noPassword: %q", args.noPassword)
 	tracef(v, "cliargs verbose: %q", args.verbose)
 
 	if err := validate(args); err != nil {
 		dief("arguments are invalid: %v", err)
 	}
 
-	hosts := hosts(args.hostexp)
+	hosts := hosts(args.hostList)
 	if len(hosts) == 0 {
 		dief("no hosts resolved from --host regex")
 	}
@@ -71,7 +69,7 @@ func main() {
 }
 
 func dief(format string, args ...interface{}) {
-	fmt.Fprintf(os.Stderr, format+"\n", args...)
+	_, _ = fmt.Fprintf(os.Stderr, format+"\n", args...)
 	os.Exit(1)
 }
 

@@ -1,5 +1,3 @@
-// Author hoenig
-
 package main
 
 import "testing"

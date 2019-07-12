@@ -1,5 +1,3 @@
-// Author hoenig
-
 package main
 
 import (
@@ -11,7 +9,9 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+
 	"github.com/pkg/errors"
+
 	"golang.org/x/crypto/ssh"
 )
 
@@ -32,9 +32,9 @@ func (s scriptfile) String() string {
 }
 
 func load(cfg args) ([]scriptfile, error) {
-	scripts := []scriptfile{}
+	var scripts []scriptfile
 
-	err := filepath.Walk(cfg.scriptdir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(cfg.scriptDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to read scripts")
 		}
@@ -72,20 +72,20 @@ func read(name, path string) (scriptfile, error) {
 func parse(name, content string) (scriptfile, error) {
 	// --- is a "key" string which causes us to create a new "script" from a single file
 	parts := strings.Split(content, "---")
-	scriptfile := scriptfile{name: name}
+	scriptFile := scriptfile{name: name}
 
 	for _, part := range parts {
 		if strings.Contains(part, "PASSWORD") {
-			scriptfile.sudo = true
+			scriptFile.sudo = true
 		}
 		lines := cleanup(strings.Split(part, "\n"))
 		if len(lines) == 0 {
-			return scriptfile, errors.Errorf("no command in script %s", name)
+			return scriptFile, errors.Errorf("no command in script %s", name)
 		}
 		s := script{lines[0], lines[1:]}
-		scriptfile.scripts = append(scriptfile.scripts, s)
+		scriptFile.scripts = append(scriptFile.scripts, s)
 	}
-	return scriptfile, nil
+	return scriptFile, nil
 }
 
 func cleanup(lines []string) []string {
@@ -111,7 +111,7 @@ func run(user, pass string, hosts []string, files []scriptfile) error {
 		}
 
 		for _, file := range files {
-			if err := executeScriptfile(client, user, pass, host, file); err != nil {
+			if err := executeScriptFile(client, user, pass, host, file); err != nil {
 				return errors.Wrapf(err, "failed to run %s on %s", file, host)
 			}
 			fmt.Println("")
@@ -147,10 +147,10 @@ func runCmd(user string, hosts []string, command string, pw bool) error {
 }
 
 func substitute(stdin []string, substitutions map[string]string) []string {
-	replaced := []string{}
+	var replaced []string
 	for _, line := range stdin {
-		for old, new := range substitutions {
-			line = strings.Replace(line, old, new, -1)
+		for oldS, newS := range substitutions {
+			line = strings.Replace(line, oldS, newS, -1)
 		}
 		replaced = append(replaced, line)
 	}
@@ -167,7 +167,7 @@ func combine(stdin []string) string {
 	return b.String()
 }
 
-func executeScriptfile(client *ssh.Client, user, pass, host string, sf scriptfile) error {
+func executeScriptFile(client *ssh.Client, user, pass, host string, sf scriptfile) error {
 	color.Magenta(fmt.Sprintf("--- %s ---", host))
 
 	for _, script := range sf.scripts {

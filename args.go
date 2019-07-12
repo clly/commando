@@ -1,5 +1,3 @@
-// Author hoenig
-
 package main
 
 import (
@@ -11,11 +9,11 @@ import (
 
 type args struct {
 	user       string
-	hostexp    string
-	scriptdir  string
+	hostList   string
+	scriptDir  string
 	command    string
 	pw         bool
-	nopassword bool
+	noPassword bool
 	verbose    bool
 }
 
@@ -23,11 +21,11 @@ func arguments() args {
 	var args args
 
 	flag.StringVar(&args.user, "user", os.Getenv("USER"), "ssh username")
-	flag.StringVar(&args.hostexp, "hosts", "", "the list of hosts")
-	flag.StringVar(&args.scriptdir, "scripts", "", "the directory full of scripts")
+	flag.StringVar(&args.hostList, "hosts", "", "the list of hosts")
+	flag.StringVar(&args.scriptDir, "scripts", "", "the directory full of scripts")
 	flag.StringVar(&args.command, "command", "", "the command to run")
 	flag.BoolVar(&args.pw, "pw", false, "send password on stdin after running --command")
-	flag.BoolVar(&args.nopassword, "no-password", false, "no-password skips password prompt")
+	flag.BoolVar(&args.noPassword, "no-password", false, "no-password skips password prompt")
 	flag.BoolVar(&args.verbose, "verbose", false, "verbose mode")
 
 	flag.Parse()
@@ -36,7 +34,7 @@ func arguments() args {
 }
 
 func validate(args args) error {
-	if args.hostexp == "" {
+	if args.hostList == "" {
 		return errors.Errorf("--hosts is required")
 	}
 
@@ -44,11 +42,11 @@ func validate(args args) error {
 		return errors.Errorf("--user or $USER must be set")
 	}
 
-	if args.scriptdir == "" && args.command == "" {
+	if args.scriptDir == "" && args.command == "" {
 		return errors.Errorf("--scripts or --command is required")
 	}
 
-	if args.scriptdir != "" && args.command != "" {
+	if args.scriptDir != "" && args.command != "" {
 		return errors.Errorf("only one of --scripts or --command allowed")
 	}
 
